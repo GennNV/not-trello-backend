@@ -1,0 +1,24 @@
+# Backend
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+.vs/
+appsettings.Development.json
+
+# Frontend
+node_modules/
+dist/
+.env
+.env.local
+.DS_Store
+
+# Databases
+*.db
+*.sqlite
+*.mdf
+*.ldf
