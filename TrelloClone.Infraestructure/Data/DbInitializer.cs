@@ -29,7 +29,7 @@ public static class DbInitializer
             },
             new Usuario
             {
-                Nombre = "John Doe",
+                Nombre = "Juan Perez",
                 Email = "user@trello.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("user123"),
                 Rol = "User",
@@ -37,8 +37,8 @@ public static class DbInitializer
             },
             new Usuario
             {
-                Nombre = "Jane Smith",
-                Email = "jane@trello.com",
+                Nombre = "Jose Paz",
+                Email = "jose@trello.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("user123"),
                 Rol = "User",
                 FechaCreacion = DateTime.UtcNow

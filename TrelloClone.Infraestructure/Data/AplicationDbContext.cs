@@ -78,7 +78,17 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.AsignadoA)
                 .WithMany()
                 .HasForeignKey(e => e.AsignadoAId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.AsignadoA)
+                .WithMany()
+                .HasForeignKey(e => e.AsignadoAId)
                 .OnDelete(DeleteBehavior.SetNull);
         });
+
+        foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+        {
+            relationship.DeleteBehavior = DeleteBehavior.NoAction;
+        }
     }
 }
