@@ -8,7 +8,7 @@ using TrelloClone.Application.DTOs.Auth;
 using TrelloClone.Application.Interfaces; 
 using TrelloClone.Infrastructure.Data;      
 using TrelloClone.Domain.Entities;
-using Bcrypt.Net;
+using BCrypt.Net;
 
 namespace TrelloClone.Infrastructure.Services;
 
@@ -28,7 +28,7 @@ public class AuthService : IAuthService
         var usuario = await _context.Usuarios
             .FirstOrDefaultAsync(u => u.Email == request.Email);
 
-        if (usuario == null || !BCrypt.Net.BCrypt.HashPassword.Verify(request.Password, usuario.PasswordHash))
+        if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.PasswordHash))
             return null;
 
         var token = GenerateJwtToken(usuario);

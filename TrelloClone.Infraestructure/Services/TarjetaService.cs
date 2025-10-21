@@ -8,7 +8,7 @@ namespace TrelloClone.Infrastructure.Services;
 
 public class TarjetaService : ITarjetaService
 {
-    private readonly ApplicationDbContext _context;  // ✅ OK ahora
+    private readonly ApplicationDbContext _context;
 
     public TarjetaService(ApplicationDbContext context)
     {

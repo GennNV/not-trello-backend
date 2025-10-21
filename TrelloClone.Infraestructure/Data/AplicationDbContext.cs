@@ -73,7 +73,8 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Lista)
                 .WithMany(l => l.Tarjetas)
                 .HasForeignKey(e => e.ListaId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             entity.HasOne(e => e.AsignadoA)
                 .WithMany()
