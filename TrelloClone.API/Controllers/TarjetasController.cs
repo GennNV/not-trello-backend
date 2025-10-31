@@ -76,19 +76,13 @@ public class TarjetasController : ControllerBase
         }
 
     [HttpPatch("{id}/mover")]
-    public async Task<IActionResult> Mover(int id, [FromBody] MoverTarjetaDto dto)
+    public async Task<IActionResult> Mover(int id, [FromBody] MoverTarjetaDTO dto)
     {
-        var result = await _tarjetaService.MoverTarjetaAsync(id, dto.NuevaListaId, dto.NuevoOrden);
+        var result = await _tarjetaService.MoverTarjetaAsync(id, dto);
 
         if (!result)
             return NotFound(new { message = $"Tarjeta con ID {id} no encontrada" });
 
         return NoContent();
     }
-}
-
-public class MoverTarjetaDto
-{
-    public int NuevaListaId { get; set; }
-    public int NuevoOrden { get; set; }
 }

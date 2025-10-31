@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TrelloClone.Application.DTOs.Tarjetas;
+﻿using TrelloClone.Application.DTOs.Tarjetas;
 using TrelloClone.Application.Interfaces;
 using TrelloClone.Domain.Entities;
 using TrelloClone.Infraestructure.Repositories;
@@ -56,16 +55,16 @@ public class TarjetaService : ITarjetaService
 
     public async Task<TarjetaDto?> UpdateAsync(int id, CreateTarjetaDto dto)
     {
-        //var tarjeta = await _context.Tarjetas.FindAsync(id);
-        //if (tarjeta == null) return null;
+        var tarjeta = await _repo.GetOne(t => t.Id == id);
+        if (tarjeta == null) return null;
 
-        //tarjeta.Titulo = dto.Titulo;
-        //tarjeta.Descripcion = dto.Descripcion;
-        //tarjeta.Prioridad = dto.Prioridad;
-        //tarjeta.FechaVencimiento = dto.FechaVencimiento;
-        //tarjeta.AsignadoAId = dto.AsignadoAId;
+        tarjeta.Titulo = dto.Titulo;
+        tarjeta.Descripcion = dto.Descripcion;
+        tarjeta.Prioridad = dto.Prioridad;
+        tarjeta.FechaVencimiento = dto.FechaVencimiento;
+        tarjeta.AsignadoAId = dto.AsignadoAId;
 
-        //await _context.SaveChangesAsync();
+        await _repo.UpdateOne(tarjeta);
         return await GetByIdAsync(id);
     }
 
@@ -78,15 +77,16 @@ public class TarjetaService : ITarjetaService
         return true;
     }
 
-    public async Task<bool> MoverTarjetaAsync(int id, int nuevaListaId, int nuevoOrden)
+    public async Task<bool> MoverTarjetaAsync(int id, MoverTarjetaDTO dto)
     {
-        //var tarjeta = await _context.Tarjetas.FindAsync(id);
-        //if (tarjeta == null) return false;
+        var tarjeta = await _repo.GetOne(t => t.Id == id);
+        if (tarjeta == null) return false;
 
-        //tarjeta.ListaId = nuevaListaId;
-        //tarjeta.Orden = nuevoOrden;
+        tarjeta.ListaId = dto.NuevaListaId;
+        tarjeta.Orden = dto.NuevoOrden;
 
-        //await _context.SaveChangesAsync();
+        await _repo.UpdateOne(tarjeta);
+
         return true;
     }
 

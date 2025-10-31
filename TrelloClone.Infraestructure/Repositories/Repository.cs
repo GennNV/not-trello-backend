@@ -50,6 +50,7 @@ namespace TrelloClone.Infraestructure.Repositories
                 query = query.Where(filter);
             }
             return await query.ToListAsync();
+            
         }
 
         async public Task<T> GetOne(Expression<Func<T, bool>>? filter = null)
@@ -59,7 +60,12 @@ namespace TrelloClone.Infraestructure.Repositories
             {
                 query = query.Where(filter);
             }
-            return await query.FirstOrDefaultAsync();
+
+            var result = await query.FirstOrDefaultAsync();
+
+            if (result != null) return result;
+
+            throw new KeyNotFoundException("Entity not found");
         }
 
         async public Task Save() => await _db.SaveChangesAsync();

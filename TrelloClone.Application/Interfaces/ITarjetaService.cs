@@ -9,5 +9,5 @@ public interface ITarjetaService
     Task<TarjetaDto> CreateAsync(CreateTarjetaDto dto);
     Task<TarjetaDto?> UpdateAsync(int id, CreateTarjetaDto dto);
     Task<bool> DeleteAsync(int id);
-    Task<bool> MoverTarjetaAsync(int id, int nuevaListaId, int nuevoOrden);
+    Task<bool> MoverTarjetaAsync(int id, MoverTarjetaDTO dto);
 }

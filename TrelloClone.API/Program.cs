@@ -10,6 +10,7 @@ using TrelloClone.Application.Interfaces;
 using TrelloClone.Infrastructure.Services;
 using TrelloClone.Infrastructure.Data;
 using TrelloClone.Infraestructure.Services;
+using TrelloClone.Infraestructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Registrar servicios (Inyección de Dependencias)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITarjetaService, TarjetaService>();
+
+//Registrar repositorios
+builder.Services.AddScoped<ITarjetaRepository, TarjetaRepository>();
 
 // Configurar autenticación JWT
 var jwtKey = builder.Configuration["Jwt:Key"]

@@ -4,9 +4,9 @@ namespace TrelloClone.Application.DTOs.Tarjetas
 {
     public class MoverTarjetaDTO
     {
-    [Required]
+        [Required]
         public int NuevaListaId { get; set; }
-    [Required]
+        [Required]
         public int NuevoOrden { get; set; }
     }
 }
