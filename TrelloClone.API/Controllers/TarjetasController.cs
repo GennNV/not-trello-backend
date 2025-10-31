@@ -63,17 +63,17 @@ public class TarjetasController : ControllerBase
         return Ok(tarjeta);
     }
 
-    [HttpDelete("{id}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var result = await _tarjetaService.DeleteAsync(id);
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _tarjetaService.DeleteAsync(id);
 
-        if (!result)
-            return NotFound(new { message = $"Tarjeta con ID {id} no encontrada" });
+            if (!result)
+                return NotFound(new { message = $"Tarjeta con ID {id} no encontrada" });
 
-        return NoContent();
-    }
+            return NoContent();
+        }
 
     [HttpPatch("{id}/mover")]
     public async Task<IActionResult> Mover(int id, [FromBody] MoverTarjetaDto dto)

@@ -9,6 +9,7 @@ using System.Text;
 using TrelloClone.Application.Interfaces;
 using TrelloClone.Infrastructure.Services;
 using TrelloClone.Infrastructure.Data;
+using TrelloClone.Infraestructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

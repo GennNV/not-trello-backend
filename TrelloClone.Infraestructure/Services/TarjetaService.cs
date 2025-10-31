@@ -2,62 +2,42 @@
 using TrelloClone.Application.DTOs.Tarjetas;
 using TrelloClone.Application.Interfaces;
 using TrelloClone.Domain.Entities;
-using TrelloClone.Infrastructure.Data;
+using TrelloClone.Infraestructure.Repositories;
 
-namespace TrelloClone.Infrastructure.Services;
+namespace TrelloClone.Infraestructure.Services;
+
 
 public class TarjetaService : ITarjetaService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ITarjetaRepository _repo;
 
-    public TarjetaService(ApplicationDbContext context)
+    public TarjetaService(ITarjetaRepository repo)
     {
-        _context = context;
+        _repo = repo;
     }
 
     public async Task<List<TarjetaDto>> GetAllAsync(string? search = null, string? estado = null)
     {
-        var query = _context.Tarjetas
-            .Include(t => t.Lista)
-            .Include(t => t.AsignadoA)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            query = query.Where(t =>
-                t.Titulo.Contains(search) ||
-                t.Descripcion.Contains(search));
-        }
-
-        if (!string.IsNullOrWhiteSpace(estado))
-        {
-            query = query.Where(t => t.Estado == estado);
-        }
-
-        var tarjetas = await query
-            .OrderBy(t => t.Lista.Orden)
-            .ThenBy(t => t.Orden)
-            .ToListAsync();
+        var tarjetas = await _repo.GetAll(t =>
+            (string.IsNullOrWhiteSpace(search) ||
+             t.Titulo.Contains(search) ||
+             t.Descripcion.Contains(search)) &&
+            (string.IsNullOrWhiteSpace(estado) || t.Estado == estado)
+        ); 
 
         return tarjetas.Select(MapToDto).ToList();
     }
 
     public async Task<TarjetaDto?> GetByIdAsync(int id)
     {
-        var tarjeta = await _context.Tarjetas
-            .Include(t => t.Lista)
-            .Include(t => t.AsignadoA)
-            .FirstOrDefaultAsync(t => t.Id == id);
-
+        var tarjeta = await _repo.GetOne(t => t.Id == id);
         return tarjeta == null ? null : MapToDto(tarjeta);
     }
 
     public async Task<TarjetaDto> CreateAsync(CreateTarjetaDto dto)
     {
-        var maxOrden = await _context.Tarjetas
-            .Where(t => t.ListaId == dto.ListaId)
-            .MaxAsync(t => (int?)t.Orden) ?? 0;
 
+        var maxOrden = await _repo.GetAll(t => t.ListaId == dto.ListaId);
         var tarjeta = new Tarjeta
         {
             Titulo = dto.Titulo,
@@ -67,49 +47,46 @@ public class TarjetaService : ITarjetaService
             ListaId = dto.ListaId,
             AsignadoAId = dto.AsignadoAId,
             FechaVencimiento = dto.FechaVencimiento,
-            Orden = maxOrden + 1
+            Orden = maxOrden.Count() + 1
         };
 
-        _context.Tarjetas.Add(tarjeta);
-        await _context.SaveChangesAsync();
-
+        await _repo.CreateOne(tarjeta);
         return (await GetByIdAsync(tarjeta.Id))!;
     }
 
     public async Task<TarjetaDto?> UpdateAsync(int id, CreateTarjetaDto dto)
     {
-        var tarjeta = await _context.Tarjetas.FindAsync(id);
-        if (tarjeta == null) return null;
+        //var tarjeta = await _context.Tarjetas.FindAsync(id);
+        //if (tarjeta == null) return null;
 
-        tarjeta.Titulo = dto.Titulo;
-        tarjeta.Descripcion = dto.Descripcion;
-        tarjeta.Prioridad = dto.Prioridad;
-        tarjeta.FechaVencimiento = dto.FechaVencimiento;
-        tarjeta.AsignadoAId = dto.AsignadoAId;
+        //tarjeta.Titulo = dto.Titulo;
+        //tarjeta.Descripcion = dto.Descripcion;
+        //tarjeta.Prioridad = dto.Prioridad;
+        //tarjeta.FechaVencimiento = dto.FechaVencimiento;
+        //tarjeta.AsignadoAId = dto.AsignadoAId;
 
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
         return await GetByIdAsync(id);
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var tarjeta = await _context.Tarjetas.FindAsync(id);
+        var tarjeta = await _repo.GetOne(t => t.Id == id);
         if (tarjeta == null) return false;
 
-        _context.Tarjetas.Remove(tarjeta);
-        await _context.SaveChangesAsync();
+        await _repo.DeleteOne(tarjeta);
         return true;
     }
 
     public async Task<bool> MoverTarjetaAsync(int id, int nuevaListaId, int nuevoOrden)
     {
-        var tarjeta = await _context.Tarjetas.FindAsync(id);
-        if (tarjeta == null) return false;
+        //var tarjeta = await _context.Tarjetas.FindAsync(id);
+        //if (tarjeta == null) return false;
 
-        tarjeta.ListaId = nuevaListaId;
-        tarjeta.Orden = nuevoOrden;
+        //tarjeta.ListaId = nuevaListaId;
+        //tarjeta.Orden = nuevoOrden;
 
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
         return true;
     }
 
