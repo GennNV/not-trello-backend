@@ -27,7 +27,6 @@ public class AuthService : IAuthService
     {
         var usuario = await _context.Usuarios
             .FirstOrDefaultAsync(u => u.Email == request.Email);
-
         if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.PasswordHash))
             return null;
 
