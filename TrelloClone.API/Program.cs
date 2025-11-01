@@ -28,6 +28,7 @@ builder.Services.AddScoped<ITarjetaService, TarjetaService>();
 
 //Registrar repositorios
 builder.Services.AddScoped<ITarjetaRepository, TarjetaRepository>();
+builder.Services.AddScoped<ITableroRepository, TableroRepository>();
 
 // Configurar autenticación JWT
 var jwtKey = builder.Configuration["Jwt:Key"]
