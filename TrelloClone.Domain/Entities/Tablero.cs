@@ -9,6 +9,7 @@
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
         public Usuario Usuario { get; set; } = null!;
+        public int UsuarioId { get; set; }
 
         public ICollection<Lista> Listas { get; set; } = new List<Lista>();
     }

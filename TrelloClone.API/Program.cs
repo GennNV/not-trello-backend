@@ -8,9 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using TrelloClone.Application.Interfaces;
 using TrelloClone.Infraestructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using TrelloClone.Infrastructure.Data;
+using TrelloClone.Infraestructure.Data;
 using TrelloClone.Infraestructure.Repositories;
-using TrelloClone.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +68,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
 
 // Configurar CORS para permitir el frontend
 builder.Services.AddCors(options =>

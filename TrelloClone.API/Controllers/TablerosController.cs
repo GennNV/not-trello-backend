@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TrelloClone.Application.DTOs.Tableros;
-using TrelloClone.Application.DTOs.Tarjetas;
 using TrelloClone.Application.Interfaces;
-using TrelloClone.Infrastructure.Data;
-
 namespace TrelloClone.API.Controllers;
 
 [ApiController]
@@ -28,13 +24,20 @@ public class TablerosController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<TableroDto>> Create([FromBody] CrearTableroDTO dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        // Obtener el id del usuario autenticado desde el token
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized();
+
+       dto.UsuarioId = int.Parse(userIdClaim.Value);
+
         var tablero = await _tablerosService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = tablero.Id }, tablero);
     }
+
 
     [HttpGet("{id}")]
     public async Task<ActionResult<TableroDto>> GetById(int id)
@@ -43,6 +46,16 @@ public class TablerosController : ControllerBase
         if (tablero == null)
             return NotFound();
         return Ok(tablero);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var success = await _tablerosService.DeleteAsync(id);
+        if (!success)
+            return NotFound(new { message = $"Tablero con ID:{id} no encontrado" });
+        return NoContent();
     }
 
 }

@@ -1,7 +1,7 @@
 ﻿using TrelloClone.Domain.Entities;
 using BCrypt.Net;
 
-namespace TrelloClone.Infrastructure.Data;
+namespace TrelloClone.Infraestructure.Data;
 
 public static class DbInitializer
 {

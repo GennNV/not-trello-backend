@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using TrelloClone.Infrastructure.Data;
+using TrelloClone.Infraestructure.Data;
 
 namespace TrelloClone.Infraestructure.Repositories
 {
@@ -42,7 +42,7 @@ namespace TrelloClone.Infraestructure.Repositories
             await Save();
         }
 
-        async public Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null)
+        public virtual async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query = dbSet;
             if (filter != null)

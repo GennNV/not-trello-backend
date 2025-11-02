@@ -1,6 +1,6 @@
 ﻿
 using TrelloClone.Domain.Entities;
-using TrelloClone.Infrastructure.Data;
+using TrelloClone.Infraestructure.Data;
 
 namespace TrelloClone.Infraestructure.Repositories
 {

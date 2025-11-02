@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TrelloClone.Application.DTOs.Admin;
-using TrelloClone.Infrastructure.Data;
+using TrelloClone.Infraestructure.Data;
 
 namespace TrelloClone.API.Controllers;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TrelloClone.Domain.Entities;
 
-namespace TrelloClone.Infrastructure.Data;
+namespace TrelloClone.Infraestructure.Data;
 
 public class ApplicationDbContext : DbContext
 {

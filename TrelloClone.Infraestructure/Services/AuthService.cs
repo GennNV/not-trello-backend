@@ -6,11 +6,11 @@ using System.Security.Claims;
 using System.Text;
 using TrelloClone.Application.DTOs.Auth;
 using TrelloClone.Application.Interfaces; 
-using TrelloClone.Infrastructure.Data;      
+using TrelloClone.Infraestructure.Data;      
 using TrelloClone.Domain.Entities;
 using BCrypt.Net;
 
-namespace TrelloClone.Infrastructure.Services;
+namespace TrelloClone.Infraestructure.Services;
 
 public class AuthService : IAuthService
 {
