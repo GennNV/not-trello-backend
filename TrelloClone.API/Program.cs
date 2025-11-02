@@ -1,16 +1,16 @@
 // ============================================
 // TrelloClone.API/Program.cs
 // ============================================
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System.Text;
 using TrelloClone.Application.Interfaces;
-using TrelloClone.Infrastructure.Services;
-using TrelloClone.Infrastructure.Data;
 using TrelloClone.Infraestructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using TrelloClone.Infrastructure.Data;
 using TrelloClone.Infraestructure.Repositories;
+using TrelloClone.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Registrar servicios (Inyección de Dependencias)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITarjetaService, TarjetaService>();
+builder.Services.AddScoped<ITablerosService, TablerosService>();
 
 //Registrar repositorios
 builder.Services.AddScoped<ITarjetaRepository, TarjetaRepository>();

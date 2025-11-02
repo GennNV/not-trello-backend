@@ -2,6 +2,7 @@
 using TrelloClone.Application.DTOs.Tableros;
 using TrelloClone.Application.DTOs.Tarjetas;
 using TrelloClone.Application.Interfaces;
+using TrelloClone.Domain.Entities;
 using TrelloClone.Infraestructure.Repositories;
 
 namespace TrelloClone.Infraestructure.Services
@@ -59,9 +60,18 @@ namespace TrelloClone.Infraestructure.Services
         {
             throw new NotImplementedException();
         }
-        public Task<TableroDto> CreateAsync(CrearTableroDTO dto)
+        public async Task<TableroDto> CreateAsync(CrearTableroDTO dto)
         {
-            throw new NotImplementedException();
+            var tablero = new Tablero
+            {
+                Titulo = dto.Titulo,
+                Descripcion = dto.Descripcion,
+                Color = dto.Color,
+            };
+
+            await _repo.CreateOne(tablero);
+
+            return (await GetByIdAsync(tablero.Id))!;
         }
 
         public Task<bool> DeleteAsync(int id)
