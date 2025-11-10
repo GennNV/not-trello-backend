@@ -29,6 +29,29 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("register")]
+    public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterRequestDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var result = await _authService.RegisterAsync(request);
+            return CreatedAtAction(nameof(GetCurrentUser), null, result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Email o username duplicado
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { message = "Error al registrar el usuario" });
+        }
+    }
+
+
     [HttpGet("me")]
     public async Task<ActionResult<UsuarioDto>> GetCurrentUser()
     {
