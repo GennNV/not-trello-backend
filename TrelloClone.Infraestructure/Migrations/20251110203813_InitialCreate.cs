@@ -47,8 +47,7 @@ namespace TrelloClone.Infraestructure.Migrations
                         name: "FK_Tableros_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "Usuarios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -68,8 +67,7 @@ namespace TrelloClone.Infraestructure.Migrations
                         name: "FK_Listas_Tableros_TableroId",
                         column: x => x.TableroId,
                         principalTable: "Tableros",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -95,14 +93,12 @@ namespace TrelloClone.Infraestructure.Migrations
                         name: "FK_Tarjetas_Listas_ListaId",
                         column: x => x.ListaId,
                         principalTable: "Listas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Tarjetas_Usuarios_AsignadoAId",
                         column: x => x.AsignadoAId,
                         principalTable: "Usuarios",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(

@@ -12,7 +12,7 @@ using TrelloClone.Infraestructure.Data;
 namespace TrelloClone.Infraestructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251018205039_InitialCreate")]
+    [Migration("20251110203813_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -194,7 +194,7 @@ namespace TrelloClone.Infraestructure.Migrations
                     b.HasOne("TrelloClone.Domain.Entities.Tablero", "Tablero")
                         .WithMany("Listas")
                         .HasForeignKey("TableroId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Tablero");
@@ -205,7 +205,7 @@ namespace TrelloClone.Infraestructure.Migrations
                     b.HasOne("TrelloClone.Domain.Entities.Usuario", "Usuario")
                         .WithMany("Tableros")
                         .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Usuario");
@@ -216,12 +216,12 @@ namespace TrelloClone.Infraestructure.Migrations
                     b.HasOne("TrelloClone.Domain.Entities.Usuario", "AsignadoA")
                         .WithMany()
                         .HasForeignKey("AsignadoAId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("TrelloClone.Domain.Entities.Lista", "Lista")
                         .WithMany("Tarjetas")
                         .HasForeignKey("ListaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("AsignadoA");
