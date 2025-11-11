@@ -5,17 +5,17 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Win32;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using TrelloClone.Application.DTOs.Auth;
-using TrelloClone.Application.Interfaces; 
 using TrelloClone.Domain.Entities;
 using TrelloClone.Infraestructure.Data;      
 using TrelloClone.Infraestructure.Exceptions;
 
 namespace TrelloClone.Infraestructure.Services;
 
-public class AuthService : IAuthService
+public class AuthService
 {
     private readonly UsuarioServices _usuarioServices;
     private readonly IConfiguration _config;
@@ -28,40 +28,41 @@ public class AuthService : IAuthService
         _encoderServices = encoderServices;
     }
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+    async public Task<LoginResponseDto?> LoginAsync(LoginRequestDto login)
     {
-        var usuario = await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.PasswordHash))
-            return null;
-
-        var token = GenerateJwtToken(usuario);
-
-        return new LoginResponseDto
+        bool IsEmail = login.Email.Contains("@");
+        Usuario user;
+        if (IsEmail)
         {
-            Token = token,
-            Usuario = new UsuarioDto
-            {
-                Id = usuario.Id,
-                Nombre = usuario.Nombre,
-                Email = usuario.Email,
-                Rol = usuario.Rol
-            }
-        };
-    }
-
-    public async Task<UsuarioDto?> GetUsuarioByIdAsync(int id)
-    {
-        var usuario = await _context.Usuarios.FindAsync(id);
-        if (usuario == null) return null;
-
-        return new UsuarioDto
+            user = await _usuarioServices.GetOneByEmailOrUsername(login.Email, null);
+        }
+        else
         {
-            Id = usuario.Id,
-            Nombre = usuario.Nombre,
-            Email = usuario.Email,
-            Rol = usuario.Rol
+            user = await _usuarioServices.GetOneByEmailOrUsername(null, login.Email);
+        }
+
+        if (user == null)
+        {
+            throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid credentials");
+        }
+
+        bool IsPassMatch = _encoderServices.Verify(login.Password, user.PasswordHash);
+
+        if (!IsPassMatch)
+        {
+            throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid credentials");
+        }
+
+        var token = GenerateJwtToken(user);
+        var usuario = new UsuarioDto
+        {
+            Id = user.Id,
+            Nombre = user.Nombre,
+            Email = user.Email,
+            Rol = user.Rol
         };
+
+        return new LoginResponseDto { Token = token, Usuario = usuario  };
     }
 
     public async Task<RegisterResponseDto?> RegisterAsync(RegisterRequestDto request)
@@ -114,5 +115,19 @@ public class AuthService : IAuthService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public async Task<UsuarioDto?> GetUsuarioByIdAsync(int id)
+    {
+        var usuario = await _usuarioServices.GetOneById(id);
+        if (usuario == null) return null;
+
+        return new UsuarioDto
+        {
+            Id = usuario.Id,
+            Nombre = usuario.Nombre,
+            Email = usuario.Email,
+            Rol = usuario.Rol
+        };
     }
 }

@@ -22,10 +22,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Registrar servicios (Inyección de Dependencias)
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ITarjetaService, TarjetaService>();
 builder.Services.AddScoped<ITablerosService, TablerosService>();
 builder.Services.AddScoped<IEncoderService, EncoderService>();
+builder.Services.AddScoped<UsuarioServices>();
 
 //Registrar repositorios
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();

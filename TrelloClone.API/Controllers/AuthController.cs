@@ -1,61 +1,92 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Win32;
+﻿using Microsoft.AspNetCore.Mvc;
 using TrelloClone.Application.DTOs.Auth;
 using TrelloClone.Application.Interfaces;
 using TrelloClone.Infraestructure.Exceptions;
 using TrelloClone.Infraestructure.Services;
-
 namespace TrelloClone.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly AuthService _authService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(AuthService authService)
     {
         _authService = authService;
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
+    public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto login)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var result = await _authService.LoginAsync(request);
-
-        if (result == null)
-            return Unauthorized(new { message = "Credenciales inválidas" });
-
-        return Ok(result);
+        try
+        {
+            var res = await _authService.LoginAsync(login);
+            return Ok(new
+            {
+                message = "Inicio de sesión exitoso.",
+                data = res
+            });
+        }
+        catch (HttpResponseError ex)
+        {
+            return StatusCode(
+                (int)ex.StatusCode,
+                new
+                {
+                    message = "Error en la solicitud HTTP.",
+                    details = ex.Message
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new
+                {
+                    message = "Error interno al iniciar sesión.",
+                    details = ex.Message
+                }
+            );
+        }
     }
+
 
     [HttpPost("register")]
     public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterRequestDto request)
     {
         try
         {
-            return Ok(await _authService.RegisterAsync(request));
+            var result = await _authService.RegisterAsync(request);
+            return Ok(new
+            {
+                message = "Usuario registrado correctamente.",
+                data = result
+            });
         }
         catch (HttpResponseError ex)
         {
             return StatusCode(
                 (int)ex.StatusCode,
-                new HttpMessage(null!, null!)
+                new
+                {
+                    message = $"Error HTTP: {ex.Message}"
+                }
             );
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return StatusCode(
                 StatusCodes.Status500InternalServerError,
-                new HttpMessage(null!, null!)
+                new
+                {
+                    message = "Error interno al registrar el usuario.",
+                    details = ex.Message
+                }
             );
         }
     }
-
 
     [HttpGet("me")]
     public async Task<ActionResult<UsuarioDto>> GetCurrentUser()

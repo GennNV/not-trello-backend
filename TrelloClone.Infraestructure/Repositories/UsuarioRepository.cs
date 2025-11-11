@@ -21,11 +21,5 @@ namespace TrelloClone.Infraestructure.Repositories
         {
             _db = db;
         }
-
-        async new public Task<Usuario> GetOne(Expression<Func<Usuario, bool>>? filter = null)
-        {
-            IQueryable<Usuario> query = dbSet;
-            return await query.FirstOrDefaultAsync();
-        }
     }
 }

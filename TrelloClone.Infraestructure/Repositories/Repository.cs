@@ -60,14 +60,8 @@ namespace TrelloClone.Infraestructure.Repositories
             {
                 query = query.Where(filter);
             }
-
-            var result = await query.FirstOrDefaultAsync();
-
-            if (result != null) return result;
-
-            throw new KeyNotFoundException("Entity not found");
+            return await query.FirstOrDefaultAsync();
         }
-
         async public Task Save() => await _db.SaveChangesAsync();
     }
 }
