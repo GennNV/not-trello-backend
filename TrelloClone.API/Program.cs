@@ -25,8 +25,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITarjetaService, TarjetaService>();
 builder.Services.AddScoped<ITablerosService, TablerosService>();
+builder.Services.AddScoped<IEncoderService, EncoderService>();
 
 //Registrar repositorios
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ITarjetaRepository, TarjetaRepository>();
 builder.Services.AddScoped<ITableroRepository, TableroRepository>();
 

@@ -32,15 +32,39 @@ namespace TrelloClone.Infraestructure.Services
 
         async public Task<Usuario> CreateOne(RegisterRequestDto registerDTO)
         {
-            var user = _mapper.Map<Usuario>(registerDTO);
-
-            var rolDefault = await _rolServices.GetOneByName(ROL.USER);
-
-            user.Roles = new List<Rol>() { rolDefault };
+            var user = new Usuario
+            {
+                Nombre = registerDTO.Username,
+                Email = registerDTO.Email,
+                PasswordHash = registerDTO.Password,
+                Rol = "User"
+            };
 
             await _repo.CreateOne(user);
 
             return user;
+        }
+
+        async public Task<Usuario> GetOneByEmailOrUsername(string? email, string? userName)
+        {
+            Usuario usuario;
+
+            if (!string.IsNullOrEmpty(userName))
+            {
+                usuario = await _repo.GetOne(x => x.Nombre == userName);
+            }
+            else if (!string.IsNullOrEmpty(email))
+            {
+                usuario = await _repo.GetOne(x => x.Email == email);
+            }
+            else
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "UserName and email are empty"
+                );
+            }
+            return usuario;
         }
     }
 }

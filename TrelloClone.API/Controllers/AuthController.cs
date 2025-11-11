@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Win32;
 using TrelloClone.Application.DTOs.Auth;
 using TrelloClone.Application.Interfaces;
+using TrelloClone.Infraestructure.Exceptions;
+using TrelloClone.Infraestructure.Services;
 
 namespace TrelloClone.API.Controllers;
 
@@ -32,22 +36,23 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterRequestDto request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
         try
         {
-            var result = await _authService.RegisterAsync(request);
-            return CreatedAtAction(nameof(GetCurrentUser), null, result);
+            return Ok(await _authService.RegisterAsync(request));
         }
-        catch (InvalidOperationException ex)
+        catch (HttpResponseError ex)
         {
-            // Email o username duplicado
-            return Conflict(new { message = ex.Message });
+            return StatusCode(
+                (int)ex.StatusCode,
+                new HttpMessage(null!, null!)
+            );
         }
         catch (Exception)
         {
-            return StatusCode(500, new { message = "Error al registrar el usuario" });
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new HttpMessage(null!, null!)
+            );
         }
     }
 
