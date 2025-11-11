@@ -1,105 +1,94 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using TrelloClone.Application.DTOs.Auth;
-using TrelloClone.Application.Interfaces; 
-using TrelloClone.Infraestructure.Data;      
+using TrelloClone.Application.Interfaces;
 using TrelloClone.Domain.Entities;
-using BCrypt.Net;
+using TrelloClone.Infraestructure.Data;      
+using TrelloClone.Infraestructure.Exceptions;
 
 namespace TrelloClone.Infraestructure.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly ApplicationDbContext _context; 
+    private readonly UsuarioServices _usuarioServices;
     private readonly IConfiguration _config;
+    private readonly IEncoderService _encoderServices;
 
-    public AuthService(ApplicationDbContext context, IConfiguration config)
+    public AuthService(UsuarioServices usuarioServices, IConfiguration config, IEncoderService encoderServices)
     {
-        _context = context;
+        _usuarioServices = usuarioServices;
         _config = config;
+        _encoderServices = encoderServices;
     }
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+    async public Task<LoginResponseDto?> LoginAsync(LoginRequestDto login)
     {
-        var usuario = await _context.Usuarios
-            .FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.PasswordHash))
-            return null;
-
-        var token = GenerateJwtToken(usuario);
-
-        return new LoginResponseDto
+        bool IsEmail = login.Email.Contains("@");
+        Usuario user;
+        if (IsEmail)
         {
-            Token = token,
-            Usuario = new UsuarioDto
-            {
-                Id = usuario.Id,
-                Nombre = usuario.Nombre,
-                Email = usuario.Email,
-                Rol = usuario.Rol
-            }
-        };
-    }
-
-    public async Task<UsuarioDto?> GetUsuarioByIdAsync(int id)
-    {
-        var usuario = await _context.Usuarios.FindAsync(id);
-        if (usuario == null) return null;
-
-        return new UsuarioDto
+            user = await _usuarioServices.GetOneByEmailOrUsername(login.Email, null);
+        }
+        else
         {
-            Id = usuario.Id,
-            Nombre = usuario.Nombre,
-            Email = usuario.Email,
-            Rol = usuario.Rol
+            user = await _usuarioServices.GetOneByEmailOrUsername(null, login.Email);
+        }
+
+        if (user == null)
+        {
+            throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid credentials");
+        }
+
+        bool IsPassMatch = _encoderServices.Verify(login.Password, user.PasswordHash);
+
+        if (!IsPassMatch)
+        {
+            throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid credentials");
+        }
+
+        var token = GenerateJwtToken(user);
+        var usuario = new UsuarioDto
+        {
+            Id = user.Id,
+            Nombre = user.Nombre,
+            Email = user.Email,
+            Rol = user.Rol
         };
+
+        return new LoginResponseDto { Token = token, Usuario = usuario  };
     }
 
     public async Task<RegisterResponseDto?> RegisterAsync(RegisterRequestDto request)
     {
-        // 1. Verificar si el email ya existe
-        var emailExists = await _context.Usuarios
-            .AnyAsync(u => u.Email.ToLower() == request.Email.ToLower());
-
-        if (emailExists)
+        var user = await _usuarioServices.GetOneByEmailOrUsername(request.Email, request.Username);
+        if (user != null)
         {
-            throw new InvalidOperationException("El email ya está registrado");
+            throw new HttpResponseError(HttpStatusCode.BadRequest, "User already exists");
         }
 
-        // 2. Verificar si el nombre de usuario ya existe (opcional pero recomendado)
-        var usernameExists = await _context.Usuarios
-            .AnyAsync(u => u.Nombre.ToLower() == request.Username.ToLower());
-
-        if (usernameExists)
+        if (request.Password != request.ConfirmPassword)
         {
-            throw new InvalidOperationException("El nombre de usuario ya está en uso");
+            throw new HttpResponseError(HttpStatusCode.BadRequest, "Password doesn't match");
         }
 
-        // 3. Crear nuevo usuario
-        var usuario = new Usuario
-        {
-            Nombre = request.Username,
-            Email = request.Email.ToLower(), // Normalizar email
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Rol = "User", // Por defecto es User, no Admin
-            FechaCreacion = DateTime.UtcNow
-        };
+        request.Password = _encoderServices.Encode(request.Password);
 
-        // 4. Guardar en base de datos
-        _context.Usuarios.Add(usuario);
-        await _context.SaveChangesAsync();
+        var userCreated = await _usuarioServices.CreateOne(request);
 
-        // 5. Retornar datos del usuario creado (sin password)
         return new RegisterResponseDto
         {
-            Id = usuario.Id,
-            Nombre = usuario.Nombre,
-            Email = usuario.Email,
-            Rol = usuario.Rol,
+            Id = userCreated.Id,
+            Nombre = userCreated.Nombre,
+            Email = userCreated.Email,
+            Rol = userCreated.Rol
         };
     }
 
@@ -127,5 +116,19 @@ public class AuthService : IAuthService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public async Task<UsuarioDto?> GetUsuarioByIdAsync(int id)
+    {
+        var usuario = await _usuarioServices.GetOneById(id);
+        if (usuario == null) return null;
+
+        return new UsuarioDto
+        {
+            Id = usuario.Id,
+            Nombre = usuario.Nombre,
+            Email = usuario.Email,
+            Rol = usuario.Rol
+        };
     }
 }

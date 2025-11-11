@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TrelloClone.Application.DTOs.Auth
 {
@@ -24,5 +18,11 @@ namespace TrelloClone.Application.DTOs.Auth
         [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número")]
         public string Password { get; set; } = string.Empty;
+
+        [Compare("Password", ErrorMessage = "Las contraseñas no coinciden.")]
+        [Required(ErrorMessage = "La confirmacion de la contraseña es requerida")]
+        [MinLength(6, ErrorMessage = "La contraseña debe tener al menos 6 caracteres")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$", ErrorMessage = "La contraseña debe contener al menos una letra mayúscula, una letra minúscula y un número")]
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

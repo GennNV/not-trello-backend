@@ -12,7 +12,7 @@ using TrelloClone.Infraestructure.Data;
 namespace TrelloClone.Infraestructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251110203813_InitialCreate")]
+    [Migration("20251111154224_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

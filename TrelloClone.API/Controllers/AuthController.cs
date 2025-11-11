@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrelloClone.Application.DTOs.Auth;
 using TrelloClone.Application.Interfaces;
-
+using TrelloClone.Infraestructure.Exceptions;
+using TrelloClone.Infraestructure.Services;
 namespace TrelloClone.API.Controllers;
 
 [ApiController]
@@ -16,41 +17,76 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto request)
+    public async Task<ActionResult<LoginResponseDto>> Login([FromBody] LoginRequestDto login)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var result = await _authService.LoginAsync(request);
-
-        if (result == null)
-            return Unauthorized(new { message = "Credenciales inválidas" });
-
-        return Ok(result);
+        try
+        {
+            var res = await _authService.LoginAsync(login);
+            return Ok(new
+            {
+                message = "Inicio de sesión exitoso.",
+                data = res
+            });
+        }
+        catch (HttpResponseError ex)
+        {
+            return StatusCode(
+                (int)ex.StatusCode,
+                new
+                {
+                    message = "Error en la solicitud HTTP.",
+                    details = ex.Message
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new
+                {
+                    message = "Error interno al iniciar sesión.",
+                    details = ex.Message
+                }
+            );
+        }
     }
+
 
     [HttpPost("register")]
     public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterRequestDto request)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
         try
         {
             var result = await _authService.RegisterAsync(request);
-            return CreatedAtAction(nameof(GetCurrentUser), null, result);
+            return Ok(new
+            {
+                message = "Usuario registrado correctamente.",
+                data = result
+            });
         }
-        catch (InvalidOperationException ex)
+        catch (HttpResponseError ex)
         {
-            // Email o username duplicado
-            return Conflict(new { message = ex.Message });
+            return StatusCode(
+                (int)ex.StatusCode,
+                new
+                {
+                    message = $"Error HTTP: {ex.Message}"
+                }
+            );
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Error al registrar el usuario" });
+            return StatusCode(
+                StatusCodes.Status500InternalServerError,
+                new
+                {
+                    message = "Error interno al registrar el usuario.",
+                    details = ex.Message
+                }
+            );
         }
     }
-
 
     [HttpGet("me")]
     public async Task<ActionResult<UsuarioDto>> GetCurrentUser()
