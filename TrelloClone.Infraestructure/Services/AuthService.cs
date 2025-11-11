@@ -9,13 +9,14 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using TrelloClone.Application.DTOs.Auth;
+using TrelloClone.Application.Interfaces;
 using TrelloClone.Domain.Entities;
 using TrelloClone.Infraestructure.Data;      
 using TrelloClone.Infraestructure.Exceptions;
 
 namespace TrelloClone.Infraestructure.Services;
 
-public class AuthService
+public class AuthService : IAuthService
 {
     private readonly UsuarioServices _usuarioServices;
     private readonly IConfiguration _config;
