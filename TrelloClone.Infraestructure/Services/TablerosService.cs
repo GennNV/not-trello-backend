@@ -53,6 +53,19 @@ namespace TrelloClone.Infraestructure.Services
 
         }
 
+        public async Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista)
+        {
+
+            var lista = await _repo.CreateLista(tableroId, createLista);
+
+            return new ListaDTO
+            {
+                Titulo = lista.Titulo,
+                Orden = lista.Orden,
+                Tarjetas = new List<Tarjeta>()
+            };
+        }
+
         //Por ahora no se pueden editar
         public Task<TableroDto?> UpdateAsync(int id, CrearTableroDTO dto)
         {

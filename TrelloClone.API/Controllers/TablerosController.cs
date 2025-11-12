@@ -38,6 +38,14 @@ public class TablerosController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = tablero.Id }, tablero);
     }
 
+    [HttpPost("{tableroId}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ListaDTO>> CreateLista(int tableroId, [FromBody] CreateListaDTO createLista)
+    {
+        var lista = await _tablerosService.CreateLista(tableroId, createLista);
+        return CreatedAtAction(nameof(GetById), new { id = tableroId }, lista);
+    }
+
 
     [HttpGet("{id}")]
     public async Task<ActionResult<TableroDto>> GetById(int id)
