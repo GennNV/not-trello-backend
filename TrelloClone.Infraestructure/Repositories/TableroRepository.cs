@@ -5,7 +5,9 @@ using TrelloClone.Infraestructure.Data;
 
 namespace TrelloClone.Infraestructure.Repositories
 {
-    public interface ITableroRepository : IRepository<Tablero> { }
+    public interface ITableroRepository : IRepository<Tablero> {
+        Task<Tablero?> GetByIdWithRelations(int id);
+    }
 
     public class TableroRepository : Repository<Tablero>, ITableroRepository
     {
@@ -16,6 +18,15 @@ namespace TrelloClone.Infraestructure.Repositories
             _context = db;
         }
 
+        public async Task<Tablero?> GetByIdWithRelations(int id)
+        {
+            return await _context.Tableros
+                .Include(t => t.Usuario)
+                .Include(t => t.Listas)
+                    .ThenInclude(l => l.Tarjetas)
+                        .ThenInclude(tar => tar.AsignadoA)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
         public override async Task<IEnumerable<Tablero>> GetAll(Expression<Func<Tablero, bool>>? filter = null)
         {
             IQueryable<Tablero> query = _context.Tableros
@@ -29,5 +40,7 @@ namespace TrelloClone.Infraestructure.Repositories
 
             return await query.ToListAsync();
         }
+
+
     }
 }

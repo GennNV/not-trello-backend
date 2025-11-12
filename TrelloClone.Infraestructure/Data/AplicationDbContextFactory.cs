@@ -15,7 +15,7 @@ namespace TrelloClone.Infraestructure.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseSqlServer(
-    "Server=W10VS\\SQLEXPRESS;Database=TrelloCloneDb;Trusted_Connection=True;TrustServerCertificate=True;"
+   "Server=DESKTOP-28LV3E3\\SQLEXPRESS;Database=TrelloCloneDb;Trusted_Connection=True;TrustServerCertificate=True;"
 );
 
             return new ApplicationDbContext(optionsBuilder.Options);
