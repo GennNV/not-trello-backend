@@ -51,7 +51,14 @@ namespace TrelloClone.Infraestructure.Services
             var tablero = await _repo.GetOne(t => t.Id == id);
             if (tablero == null) return false;
 
+            try
+            {
             await _repo.DeleteOne(tablero);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
             return true;
 
         }
@@ -61,8 +68,16 @@ namespace TrelloClone.Infraestructure.Services
             var lista = await _repo.GetOneListById(listaId);
             Console.WriteLine(lista);
             if (lista == null) return false;
-
+            try
+            {
             await _repo.DeleteLista(lista);
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
             return true;
 
         }
