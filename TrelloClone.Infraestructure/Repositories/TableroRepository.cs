@@ -8,7 +8,8 @@ namespace TrelloClone.Infraestructure.Repositories
 {
     public interface ITableroRepository : IRepository<Tablero>
     {
-        public Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista);
+        Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista);
+        Task<Tablero?> GetByIdWithRelations(int id);
     }
 
     public class TableroRepository : Repository<Tablero>, ITableroRepository
@@ -19,7 +20,6 @@ namespace TrelloClone.Infraestructure.Repositories
         {
             _context = db;
         }
-
         public async Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista)
         {
             var lista = new Lista
@@ -39,6 +39,15 @@ namespace TrelloClone.Infraestructure.Repositories
             };
         }
 
+        public async Task<Tablero?> GetByIdWithRelations(int id)
+        {
+            return await _context.Tableros
+                .Include(t => t.Usuario)
+                .Include(t => t.Listas)
+                    .ThenInclude(l => l.Tarjetas)
+                        .ThenInclude(tar => tar.AsignadoA)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
         public override async Task<IEnumerable<Tablero>> GetAll(Expression<Func<Tablero, bool>>? filter = null)
         {
             IQueryable<Tablero> query = _context.Tableros
@@ -52,5 +61,7 @@ namespace TrelloClone.Infraestructure.Repositories
 
             return await query.ToListAsync();
         }
+
+
     }
 }

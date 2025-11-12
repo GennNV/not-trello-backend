@@ -1,4 +1,5 @@
 ﻿using TrelloClone.Application.DTOs.Tableros;
+using TrelloClone.Domain.Entities;
 
 namespace TrelloClone.Application.Interfaces
 {

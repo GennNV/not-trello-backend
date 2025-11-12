@@ -24,9 +24,11 @@ namespace TrelloClone.Infraestructure.Services
         }
         public async Task<TableroDto?> GetByIdAsync(int id)
         {
-            var tablero = await _repo.GetOne(t => t.Id == id);
+            var tablero = await _repo.GetByIdWithRelations(id);
             return tablero == null ? null : MapToDto(tablero);
         }
+
+        //Cambio para que el boludo de mateo haga bien las cosas
         public async Task<TableroDto> CreateAsync(CrearTableroDTO dto)
         {
             Console.WriteLine($"UsuarioId antes de guardar: {dto.UsuarioId}");
@@ -123,6 +125,8 @@ namespace TrelloClone.Infraestructure.Services
                 NombreAsignado = tar.AsignadoA?.Nombre
             };
         }
+
+        
     }
 
 
