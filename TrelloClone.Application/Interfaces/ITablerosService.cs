@@ -8,7 +8,7 @@ namespace TrelloClone.Application.Interfaces
         Task<List<TableroDto>> GetAllAsync();
         Task<TableroDto?> GetByIdAsync(int id);
         Task<TableroDto> CreateAsync(CrearTableroDTO dto);
-        Task<TableroDto?> UpdateAsync(int id, CrearTableroDTO dto);
+        Task<TableroDto?> UpdateAsync(int id, List<int> dto);
         Task<bool> DeleteAsync(int id);
         Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista);
     }

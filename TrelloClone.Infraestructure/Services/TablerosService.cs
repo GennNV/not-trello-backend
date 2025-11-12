@@ -1,4 +1,5 @@
-﻿using TrelloClone.Application.DTOs.Tableros;
+﻿using Microsoft.EntityFrameworkCore;
+using TrelloClone.Application.DTOs.Tableros;
 using TrelloClone.Application.DTOs.Tarjetas;
 using TrelloClone.Application.Interfaces;
 using TrelloClone.Domain.Entities;
@@ -68,10 +69,31 @@ namespace TrelloClone.Infraestructure.Services
             };
         }
 
-        //Por ahora no se pueden editar
-        public Task<TableroDto?> UpdateAsync(int id, CrearTableroDTO dto)
+        // Services/TablerosService.cs
+        public async Task<TableroDto?> UpdateAsync(int tableroId, List<int> listaIds)
         {
-            throw new NotImplementedException();
+            // Verificar que el tablero existe
+            var tablero = await _repo.GetByIdWithRelations(tableroId);
+            if (tablero == null)
+                throw new KeyNotFoundException($"Tablero con ID:{tableroId} no encontrado");
+
+            // Verificar que todas las listas pertenecen a este tablero
+            var listasDelTablero = tablero.Listas.Select(l => l.Id).ToList();
+            if (!listaIds.All(id => listasDelTablero.Contains(id)))
+                throw new InvalidOperationException("Algunas listas no pertenecen a este tablero");
+
+            // Actualizar el orden de cada lista
+            for (int i = 0; i < listaIds.Count; i++)
+            {
+                var lista = tablero.Listas.FirstOrDefault(l => l.Id == listaIds[i]);
+                if (lista != null)
+                {
+                    lista.Orden = i;
+                }
+            }
+
+             await _repo.Save();
+            return MapToDto(tablero);
         }
 
         //Metodos extra

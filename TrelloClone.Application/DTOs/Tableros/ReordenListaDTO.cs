@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace TrelloClone.Application.DTOs.Tableros
 {
-    public class ReordenListaDTO
+    public class ReorderListasDto
     {
-
+        public List<int> ListaIds { get; set; } = new();
     }
 }

@@ -47,6 +47,28 @@ public class TablerosController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = tableroId }, lista);
     }
 
+    [HttpPatch("{tableroId}/listas/reorder")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ReorderListas(int tableroId, [FromBody] ReorderListasDto dto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await _tablerosService.UpdateAsync(tableroId, dto.ListaIds);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al reordenar listas", error = ex.Message });
+        }
+    }
+
 
     [HttpGet("{id}")]
     public async Task<ActionResult<TableroDto>> GetById(int id)

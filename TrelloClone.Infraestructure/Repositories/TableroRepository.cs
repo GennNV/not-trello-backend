@@ -10,6 +10,7 @@ namespace TrelloClone.Infraestructure.Repositories
     {
         Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista);
         Task<Tablero?> GetByIdWithRelations(int id);
+        //Task<> UpdateAsync();
     }
 
     public class TableroRepository : Repository<Tablero>, ITableroRepository
