@@ -10,7 +10,9 @@ namespace TrelloClone.Infraestructure.Repositories
     {
         Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista);
         Task<Tablero?> GetByIdWithRelations(int id);
-        //Task<> UpdateAsync();
+        Task<Lista?> GetOneListById(int listId);
+        Task<bool> DeleteLista(Lista lista);
+       
     }
 
     public class TableroRepository : Repository<Tablero>, ITableroRepository
@@ -48,6 +50,20 @@ namespace TrelloClone.Infraestructure.Repositories
                     .ThenInclude(l => l.Tarjetas)
                         .ThenInclude(tar => tar.AsignadoA)
                 .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<Lista?> GetOneListById(int listId)
+        {
+            return await _context.Listas
+                .Include(l => l.Tarjetas)
+                .FirstOrDefaultAsync(l => l.Id == listId);
+        }
+
+        public async Task<bool> DeleteLista(Lista lista)
+        {
+            _context.Listas.Remove(lista);
+            await _context.SaveChangesAsync();
+            return true;
         }
         public override async Task<IEnumerable<Tablero>> GetAll(Expression<Func<Tablero, bool>>? filter = null)
         {

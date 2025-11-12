@@ -89,4 +89,14 @@ public class TablerosController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{listaId}/listas/delete")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteLista(int listaId)
+    {
+        var success = await _tablerosService.DeleteListaAsync(listaId);
+        if (!success)
+            return NotFound(new { message = $"Lista con ID:{listaId} no encontrado" });
+        return NoContent();
+    }
+
 }

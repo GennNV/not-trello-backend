@@ -56,6 +56,17 @@ namespace TrelloClone.Infraestructure.Services
 
         }
 
+        public async Task<bool> DeleteListaAsync(int listaId)
+        {
+            var lista = await _repo.GetOneListById(listaId);
+            Console.WriteLine(lista);
+            if (lista == null) return false;
+
+            await _repo.DeleteLista(lista);
+            return true;
+
+        }
+
         public async Task<ListaDTO> CreateLista(int tableroId, CreateListaDTO createLista)
         {
 
