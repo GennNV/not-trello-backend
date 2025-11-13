@@ -63,6 +63,7 @@ public class TarjetaService : ITarjetaService
         tarjeta.Prioridad = dto.Prioridad;
         tarjeta.FechaVencimiento = dto.FechaVencimiento;
         tarjeta.AsignadoAId = dto.AsignadoAId;
+        tarjeta.Estado = dto.Estado;
 
         await _repo.UpdateOne(tarjeta);
         return await GetByIdAsync(id);

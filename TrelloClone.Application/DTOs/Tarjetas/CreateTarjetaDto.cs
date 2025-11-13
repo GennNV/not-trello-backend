@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace TrelloClone.Application.DTOs.Tarjetas;
 
@@ -12,6 +13,9 @@ public class CreateTarjetaDto
 
     [Required]
     public string Prioridad { get; set; } = "Media";
+
+    [Required]
+    public string Estado { get; set; } = string.Empty!;
 
     [Required]
     public int ListaId { get; set; }
